@@ -51,7 +51,7 @@ public class AnalyzerDriver {
             System.out.println(rewriter.getText());
 
             // save augmented code
-            String augmentedFilePath = "./augmented_files/augmented"+".java";
+            String augmentedFilePath = "./augmented_files/"+extractor.getNewClassName()+".java";
             FileWriter myWriter = new FileWriter(augmentedFilePath, false);
             myWriter.write(rewriter.getText());
             myWriter.close();

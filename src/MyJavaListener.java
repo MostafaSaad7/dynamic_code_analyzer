@@ -158,5 +158,10 @@ public class MyJavaListener extends JavaParserBaseListener{
 
     }
 
+    public String getNewClassName()
+    {
+        return newClassName;
+    }
+
 
 }
