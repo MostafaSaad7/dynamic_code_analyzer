@@ -2,14 +2,38 @@ import org.antlr.v4.runtime.*;
 
 public class MyJavaListener extends JavaParserBaseListener{
 
+    boolean fileWriterImport = false;
+    boolean ioExceptionImport = false;
+
     JavaParser parser;
     TokenStreamRewriter rewriter;
 
     int blockNumber= 1;
-    String newClassName;
+    String newClassName = "augmented";
 
     public MyJavaListener(JavaParser parser, TokenStreamRewriter rewriter) {
         this.parser = parser; this.rewriter = rewriter;
+    }
+
+    @Override
+    public void enterCompilationUnit(JavaParser.CompilationUnitContext ctx) {
+
+        if(ctx.importDeclaration().isEmpty())
+        {
+            if(ctx.packageDeclaration() == null)
+            {
+
+                rewriter.insertBefore(ctx.getStart(), "\nimport java.io.FileWriter;\n");
+                rewriter.insertBefore(ctx.getStart(), "\nimport java.io.IOException;\n");
+            }
+            else
+            {
+                rewriter.insertAfter(ctx.packageDeclaration().getStop(), "\nimport java.io.FileWriter;\n");
+                rewriter.insertAfter(ctx.packageDeclaration().getStop(), "\nimport java.io.IOException;\n");
+            }
+
+        }
+        rewriter.insertBefore(0, "\npackage augmented_files;\n");
     }
 
     @Override
@@ -43,6 +67,28 @@ public class MyJavaListener extends JavaParserBaseListener{
         if(methodName.equals("main"))
         {
             rewriter.insertBefore(ctx.methodBody().getStop(), "\n\n\t\tmyWriter.close();\n");
+        }
+    }
+
+    @Override
+    public void enterImportDeclaration(JavaParser.ImportDeclarationContext ctx) {
+        if(ctx.qualifiedName().getText().equals("java.io.FileWriter"))
+            fileWriterImport = true;
+
+        if(ctx.qualifiedName().getText().equals("java.io.IOException"))
+            ioExceptionImport = true;
+    }
+
+
+    @Override
+    public void exitImportDeclaration(JavaParser.ImportDeclarationContext ctx) {
+        if(fileWriterImport == false)
+        {
+            rewriter.insertAfter(ctx.getStop(), "\nimport java.io.FileWriter;\n");
+        }
+        if(ioExceptionImport == false)
+        {
+            rewriter.insertAfter(ctx.getStop(), "\nimport java.io.IOException;\n");
         }
     }
 
