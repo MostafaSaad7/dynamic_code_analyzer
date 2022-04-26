@@ -41,6 +41,8 @@ public class MyJavaListener extends JavaParserBaseListener{
         newClassName = ctx.identifier().getText()+"Augmented";
         rewriter.replace(ctx.identifier().getStart(),ctx.identifier().getStop(),newClassName);
 
+        rewriter.insertAfter(ctx.classBody().getStart(), "\n\n\t\tstatic FileWriter myWriter;\n");
+
     }
 
     @Override
