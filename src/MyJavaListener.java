@@ -21,7 +21,20 @@ public class MyJavaListener extends JavaParserBaseListener{
             rewriter.insertAfter(ctx.methodBody().getStart(), "\n\n\t\tmyWriter = new FileWriter(\"visited_blocks/"+newClassName+"VisitedBlocks.txt\");\n");
         }
 
+        if(ctx.THROWS() != null)
+        {
+            String exceptions = ctx.qualifiedNameList().getText();
+            if(!exceptions.contains("IOException"))
+            {
+                rewriter.insertAfter(ctx.THROWS().getSymbol(), " IOException,");
+            }
+        }
+        else
+        {
+            rewriter.insertBefore(ctx.methodBody().getStart(), "throws IOException");
+        }
     }
+
 
     @Override
     public void exitMethodDeclaration(JavaParser.MethodDeclarationContext ctx) {
