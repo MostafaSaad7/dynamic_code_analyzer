@@ -37,6 +37,13 @@ public class MyJavaListener extends JavaParserBaseListener{
     }
 
     @Override
+    public void enterClassDeclaration(JavaParser.ClassDeclarationContext ctx) {
+        newClassName = ctx.identifier().getText()+"Augmented";
+        rewriter.replace(ctx.identifier().getStart(),ctx.identifier().getStop(),newClassName);
+
+    }
+
+    @Override
     public void enterMethodDeclaration(JavaParser.MethodDeclarationContext ctx) {
         String methodName = ctx.identifier().getText();
 
