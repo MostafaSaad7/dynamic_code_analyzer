@@ -6,11 +6,14 @@ package augmented_files;
 import java.io.IOException;
 
 import java.io.FileWriter;
-class HelloWorld {
+class HelloWorldAugmented {
+
+		static FileWriter myWriter;
+
 	
     public static void main(String[] args) throws IOException{
 
-		myWriter = new FileWriter("visited_blocks/nullVisitedBlocks.txt");
+		myWriter = new FileWriter("visited_blocks/HelloWorldAugmentedVisitedBlocks.txt");
 
 
 		// block number: 1

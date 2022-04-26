@@ -15,6 +15,7 @@ public class MyJavaListener extends JavaParserBaseListener{
         this.parser = parser; this.rewriter = rewriter;
     }
 
+
     @Override
     public void enterCompilationUnit(JavaParser.CompilationUnitContext ctx) {
 
@@ -36,6 +37,7 @@ public class MyJavaListener extends JavaParserBaseListener{
         rewriter.insertBefore(0, "\npackage augmented_files;\n");
     }
 
+
     @Override
     public void enterClassDeclaration(JavaParser.ClassDeclarationContext ctx) {
         newClassName = ctx.identifier().getText()+"Augmented";
@@ -44,6 +46,7 @@ public class MyJavaListener extends JavaParserBaseListener{
         rewriter.insertAfter(ctx.classBody().getStart(), "\n\n\t\tstatic FileWriter myWriter;\n");
 
     }
+
 
     @Override
     public void enterMethodDeclaration(JavaParser.MethodDeclarationContext ctx) {
@@ -79,6 +82,7 @@ public class MyJavaListener extends JavaParserBaseListener{
         }
     }
 
+
     @Override
     public void enterImportDeclaration(JavaParser.ImportDeclarationContext ctx) {
         if(ctx.qualifiedName().getText().equals("java.io.FileWriter"))
@@ -111,6 +115,48 @@ public class MyJavaListener extends JavaParserBaseListener{
         rewriter.insertAfter(ctx.getStart(), "\n\n\t\t" + insertCode + "\n");
     }
 
+
+    // handling for & if & else & while with no blocks
+    @Override
+    public void enterStatement(JavaParser.StatementContext ctx) {
+        if(ctx.FOR() != null  || ctx.WHILE() != null || ctx.IF() != null)
+        {
+            int statementIndex = 0;
+
+            if(!ctx.statement(statementIndex).getStart().getText().equals("{"))
+            {
+
+                String insertCode = "// block number: "+blockNumber+"\n\t\tmyWriter.write(\"Entered Block Number: "+ blockNumber++ +"\\n\");";
+
+                rewriter.insertBefore(ctx.statement(statementIndex).getStart(), "\n\n\t\t" + insertCode + "\n");
+
+                rewriter.insertBefore(ctx.statement(statementIndex).getStart(), "{\n");
+
+                rewriter.insertAfter(ctx.statement(statementIndex).getStop(), "\n\t\t}\n");
+            }
+        }
+
+        if(ctx.ELSE() != null)
+        {
+            if(!ctx.statement(1).getStart().getText().equals("if"))
+            {
+                int statementIndex = 1;
+
+                if(!ctx.statement(statementIndex).getStart().getText().equals("{"))
+                {
+
+                    String insertCode = "// block number: "+blockNumber+"\n\t\tmyWriter.write(\"Entered Block Number: "+ blockNumber++ +"\\n\");";
+
+                    rewriter.insertBefore(ctx.statement(statementIndex).getStart(), "\n\n\t\t" + insertCode + "\n");
+
+                    rewriter.insertBefore(ctx.statement(statementIndex).getStart(), "{\n");
+
+                    rewriter.insertAfter(ctx.statement(statementIndex).getStop(), "\n\t\t}\n");
+                }
+            }
+        }
+
+    }
 
 
 }
