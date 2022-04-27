@@ -33,8 +33,10 @@ public class MyJavaListener extends JavaParserBaseListener{
                 rewriter.insertAfter(ctx.packageDeclaration().getStop(), "\nimport java.io.IOException;\n");
             }
 
+            fileWriterImport = true;
+            ioExceptionImport = true;
+
         }
-        rewriter.insertBefore(0, "\npackage augmented_files;\n");
     }
 
 
