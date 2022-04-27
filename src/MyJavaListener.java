@@ -92,16 +92,16 @@ public class MyJavaListener extends JavaParserBaseListener{
             ioExceptionImport = true;
     }
 
-
     @Override
-    public void exitImportDeclaration(JavaParser.ImportDeclarationContext ctx) {
+    public void enterTypeDeclaration(JavaParser.TypeDeclarationContext ctx) {
+        super.enterTypeDeclaration(ctx);
         if(fileWriterImport == false)
         {
-            rewriter.insertAfter(ctx.getStop(), "\nimport java.io.FileWriter;\n");
+            rewriter.insertBefore(ctx.getStart(), "\nimport java.io.FileWriter;\n");
         }
         if(ioExceptionImport == false)
         {
-            rewriter.insertAfter(ctx.getStop(), "\nimport java.io.IOException;\n");
+            rewriter.insertBefore(ctx.getStart(), "\nimport java.io.IOException;\n");
         }
     }
 
