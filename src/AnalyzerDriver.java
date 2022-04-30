@@ -1,6 +1,7 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
+import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +38,9 @@ public class AnalyzerDriver {
 
         // wait for the text file with visited block to be saved
         TimeUnit.SECONDS.sleep(1);
+
+        // deliverable 3 (generate html file for statement & branches code converge)
+        htmlGenerator(augmentedJavaCode, textFileName);
 
     }
 
@@ -153,5 +157,70 @@ public class AnalyzerDriver {
         }
 
         return extractor.getNewClassName();
+    }
+
+    /**
+     * <b>This function is responsible for generating html file</b><br>
+     * read the visited blocks from the text file to assign color for each block.<br>
+     * generate a html with colored blocks.<br>
+     * running the generated html file automatically using a desired browser.
+     * @param code this is the augmented java code.
+     * @param textFileName this is the augmented file name.
+     * @throws IOException throw an I/O exception if a file does not exist.
+     * @return {@link Void}
+     */
+    public static void htmlGenerator(String code, String textFileName) throws IOException {
+
+        Map<Integer, String> enteredBlocks = new HashMap<Integer, String>();
+
+        // starter code
+        ANTLRInputStream input = new ANTLRInputStream(code);
+
+        JavaLexer lexer = new JavaLexer(input);
+
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        JavaParser parser = new JavaParser(tokens);
+
+        // create token stream rewriter to inject code snippets
+        TokenStreamRewriter htmlRewriter = new TokenStreamRewriter(tokens);
+
+        ParseTree tree = parser.compilationUnit();
+
+        ParseTreeWalker walker = new ParseTreeWalker();
+
+        // read visited blocks from the text file
+        FileInputStream textFis=new FileInputStream("visited_blocks/"+textFileName+"VisitedBlocks.txt");    //creates a new file instance
+        Scanner textFileScanner=new Scanner(textFis);
+        while(textFileScanner.hasNextLine())
+        {
+            String[] mapData = textFileScanner.nextLine().split(" ");
+
+            int blockNum = Integer.parseInt(mapData[0]);
+
+            if(enteredBlocks.containsKey(blockNum) && enteredBlocks.get(blockNum).trim().equals("green"))
+                continue;
+
+            enteredBlocks.put(blockNum, mapData[1].trim());
+        }
+        textFileScanner.close();    //closes the stream and release the resources
+
+
+        MyHTMLGenerator htmlGenerator = new MyHTMLGenerator(parser,htmlRewriter, enteredBlocks);
+
+        walker.walk(htmlGenerator, tree);
+
+        //html cod
+//        System.out.println(htmlRewriter.getText());
+
+        // save html code
+        String htmlFilePath = "./html_files/"+textFileName+".html";
+        FileWriter myWriter = new FileWriter(htmlFilePath, false);
+        myWriter.write(htmlRewriter.getText());
+        myWriter.close();
+
+        // running the generated html file automatically using the desired browser
+        File htmlFile = new File("html_files/"+textFileName+".html");
+        Desktop.getDesktop().browse(htmlFile.toURI());
     }
 }
