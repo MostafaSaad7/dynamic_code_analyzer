@@ -1,14 +1,14 @@
 import org.antlr.v4.runtime.TokenStreamRewriter;
 
 /**
- * This is the detailed description for this class.
+ * <p>This is the detailed description for this class.</p>
  * This class provide implementation for a subset of the available methods provided in {@link JavaParserListener}.
  *
  * This class <b>MyJavaCodeAugmenter</b> main goal is to augment the input java code used in a dynamic code analyzer
  * to handle flow control statements like while, for, if, and else with no blocks.
  *
- * \param parser JavaParser
- * \param rewriter TokenStreamRewriter
+ * \param parser {@link JavaParser}
+ * \param rewriter {@link TokenStreamRewriter}
  */
 public class MyJavaCodeAugmenter extends JavaParserBaseListener{
 
