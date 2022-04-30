@@ -1,5 +1,18 @@
 import org.antlr.v4.runtime.*;
 
+/**
+ *
+ * <p>This is the detailed description for this class.</p>
+ * This class provide implementation for a subset of the available methods provided in {@link JavaParserListener}.
+ *
+ * This class <b>MyTextFileGenerator</b> main goal is to augment the input java code to generate
+ * a text file containing the number of the visited blocks that can be used in building a dynamic code analyzer for Java.
+ *
+ * \param parser {@link JavaParser}
+ * \param rewriter {@link TokenStreamRewriter}
+ *
+ */
+
 public class MyTextFileGenerator extends JavaParserBaseListener{
 
     boolean fileWriterImport = false;

@@ -1,14 +1,31 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
-import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
+/**
+ *
+ * <p>This is the detailed description for this class.</p>
+ *
+ * <p>This class <b>AnalyzerDriver</b> works as the main driver for a dynamic code analyzer for Java programming language.</p>
+ *
+ * This class is responsible for taking a java file path from the user and generating a text file that contains the
+ * details of the visited blocks, and generating an html file that contains statement and branches code coverage reports.
+ *
+ */
 
 public class AnalyzerDriver {
+
+    /**
+     *
+     * This function acts as the driver for {@link AnalyzerDriver} class.
+     *
+     * \return {@link Void}
+     *
+     */
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
@@ -21,10 +38,20 @@ public class AnalyzerDriver {
         // wait for the text file with visited block to be saved
         TimeUnit.SECONDS.sleep(1);
 
-
     }
 
-    private static String augmentedCode() throws IOException {
+    /**
+     *
+     * This function acts as the driver for {@link MyJavaCodeAugmenter} class.
+     *
+     * This function prompts the user for the path of a java file and initialize an instance of {@link MyJavaCodeAugmenter}
+     * to handle the flow control statements like [for & if & else & while] with no blocks and returns the augmented code.
+     *
+     *
+     * \return augmentedJavaCode {@link String}
+     *
+     */
+    public static String augmentedCode() throws IOException {
 
         // read java filename
         System.out.print("Enter java file path: ");
@@ -57,7 +84,7 @@ public class AnalyzerDriver {
         //original code
 //        System.out.println(rewriter.getText());
 
-        MyJavaListener extractor = new MyJavaListener(parser,rewriter);
+        MyJavaCodeAugmenter extractor = new MyJavaCodeAugmenter(parser,rewriter);
 
         walker.walk(extractor, tree);
 
@@ -69,7 +96,21 @@ public class AnalyzerDriver {
         return rewriter.getText();
     }
 
-    private static String textFileGenerator(String code) throws IOException {
+    /**
+     *
+     * This function acts as the driver for {@link MyTextFileGenerator} class.
+     *
+     * This function takes a java code as an argument and initialize an instance of {@link MyTextFileGenerator} to
+     * generate an augmented java program that is responsible for generating a text file containing the details of
+     * the visited code blocks.
+     *
+     *
+     * \param javaCode {@link String}
+     *
+     * \return textFileName {@link String}
+     *
+     */
+    public static String textFileGenerator(String code) throws IOException {
 
         // starter code
         ANTLRInputStream input = new ANTLRInputStream(code);
