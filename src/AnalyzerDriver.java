@@ -1,7 +1,6 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
-import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -57,7 +56,7 @@ public class AnalyzerDriver {
         //original code
 //        System.out.println(rewriter.getText());
 
-        MyJavaListener extractor = new MyJavaListener(parser,rewriter);
+        MyJavaCodeAugmenter extractor = new MyJavaCodeAugmenter(parser,rewriter);
 
         walker.walk(extractor, tree);
 
