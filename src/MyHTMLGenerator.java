@@ -73,13 +73,13 @@ public class MyHTMLGenerator extends JavaParserBaseListener {
         String pre;
         if (!enteredBlocks.containsKey(blockNumber))
         {
-            pre = "<span style=\"background-color: rgb(245, 173, 153); margin: 0%;\">";
+            pre = "<pre style=\"background-color: rgb(245, 173, 153); margin: 0%;\">";
 
 //        System.out.println("hello parent "+ctx.getParent().getParent().getText());
             //TODO: inject pre string before parent
 
             rewriter.insertBefore(ctx.getStart(), pre + "\t");
-            rewriter.insertAfter(ctx.getStop(), "</span>");
+            rewriter.insertAfter(ctx.getStop(), "</pre>");
         }
         blockNumber++;
 
@@ -98,7 +98,7 @@ public class MyHTMLGenerator extends JavaParserBaseListener {
         {
             if (enteredBlocks.containsKey(blockNumber) && enteredBlocks.get(blockNumber).equals("orange"))
             {
-                String pre = "<span style=\"background-color: rgb(241, 206, 116); margin: 0%;\">";
+                String span = "<span style=\"background-color: rgb(241, 206, 116); margin: 0%;\">";
                 Token startToken = null;
                 Token stopToken = null;
 
@@ -113,7 +113,7 @@ public class MyHTMLGenerator extends JavaParserBaseListener {
                     stopToken =  ctx.parExpression().expression().getStop();
                 }
 
-                rewriter.insertBefore(startToken, pre);
+                rewriter.insertBefore(startToken, span);
                 rewriter.insertAfter(stopToken, "</span>");
             }
         }
