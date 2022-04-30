@@ -129,6 +129,18 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
 
 
     // injecting Entered blocked code
+
+    /**
+     * This function is responsible for injecting the code snippet that write the entered block number and its color in a text file. \n
+     *
+     * the production of the grammar rule is :
+     * block :
+     * '{' blockStatement* '}' ;
+     *
+     * \param ctx Ctx that contain the children of this rule
+     *
+     * \return {@link Void}
+     */
     @Override
     public void enterBlock(JavaParser.BlockContext ctx) {
 
@@ -144,11 +156,10 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
     }
 
 
-    // handling for & if & else & while with no blocks
     @Override
     public void enterStatement(JavaParser.StatementContext ctx) {
 
-        
+
         if (ctx.FOR() != null || ctx.WHILE() != null || ctx.IF() != null)
         {
 
@@ -181,6 +192,7 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
         }
     }
 
+   
     public String getNewClassName()
     {
         return newClassName;
