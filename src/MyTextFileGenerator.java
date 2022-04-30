@@ -156,6 +156,20 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
     }
 
 
+    /**
+     * This function is responsible for handling branch coverage by
+     * injecting entered block number and its color in a text file, the color will either be Orange or Green depending on the expression. \n
+     *
+     * the production of the grammar rule is : \n
+     * statement : \n
+     * IF parExpression statement (ELSE statement)? \n
+     * | FOR '(' forControl ')' statement \n
+     * | WHILE parExpression statement;
+     *
+     * \param ctx Ctx that contain the children of this rule
+     *
+     * \return {@link Void}
+     */
     @Override
     public void enterStatement(JavaParser.StatementContext ctx) {
 
@@ -192,7 +206,7 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
         }
     }
 
-   
+
     public String getNewClassName()
     {
         return newClassName;
