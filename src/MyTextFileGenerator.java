@@ -1,0 +1,177 @@
+import org.antlr.v4.runtime.*;
+
+public class MyTextFileGenerator extends JavaParserBaseListener{
+
+    boolean fileWriterImport = false;
+    boolean ioExceptionImport = false;
+    boolean isFlowControlStatement = false;
+
+    JavaParser parser;
+    TokenStreamRewriter rewriter;
+
+    int blockNumber= 0;
+    String newClassName = "augmented";
+
+    public MyTextFileGenerator(JavaParser parser, TokenStreamRewriter rewriter) {
+        this.parser = parser; this.rewriter = rewriter;
+    }
+
+
+    // handling required imports if there are no other import statements
+    @Override
+    public void enterCompilationUnit(JavaParser.CompilationUnitContext ctx) {
+
+        if(ctx.importDeclaration().isEmpty())
+        {
+            if(ctx.packageDeclaration() == null)
+            {
+
+                rewriter.insertBefore(ctx.getStart(), "\nimport java.io.FileWriter;\n");
+                rewriter.insertBefore(ctx.getStart(), "\nimport java.io.IOException;\n");
+            }
+            else
+            {
+                rewriter.insertAfter(ctx.packageDeclaration().getStop(), "\nimport java.io.FileWriter;\n");
+                rewriter.insertAfter(ctx.packageDeclaration().getStop(), "\nimport java.io.IOException;\n");
+            }
+
+            fileWriterImport = true;
+            ioExceptionImport = true;
+
+        }
+    }
+
+
+    // handling augmented class name
+    @Override
+    public void enterClassDeclaration(JavaParser.ClassDeclarationContext ctx) {
+        newClassName = ctx.identifier().getText()+"Augmented";
+        rewriter.replace(ctx.identifier().getStart(),ctx.identifier().getStop(),newClassName);
+
+        rewriter.insertAfter(ctx.classBody().getStart(), "\n\n\t\tstatic FileWriter myWriter;\n");
+
+    }
+
+
+    // handling exceptions & initializing the FileWriter in the main function
+    @Override
+    public void enterMethodDeclaration(JavaParser.MethodDeclarationContext ctx) {
+        String methodName = ctx.identifier().getText();
+
+        if(methodName.equals("main"))
+        {
+            rewriter.insertAfter(ctx.methodBody().getStart(), "\n\n\t\tmyWriter = new FileWriter(\"visited_blocks/"+newClassName+"VisitedBlocks.txt\");\n");
+        }
+
+        if(ctx.THROWS() != null)
+        {
+            String exceptions = ctx.qualifiedNameList().getText();
+            if(!exceptions.contains("IOException"))
+            {
+                rewriter.insertAfter(ctx.THROWS().getSymbol(), " IOException,");
+            }
+        }
+        else
+        {
+            rewriter.insertBefore(ctx.methodBody().getStart(), "throws IOException");
+        }
+    }
+
+    // injecting code snippet for closing the text file
+    @Override
+    public void exitMethodDeclaration(JavaParser.MethodDeclarationContext ctx) {
+        String methodName = ctx.identifier().getText();
+
+        if(methodName.equals("main"))
+        {
+            rewriter.insertBefore(ctx.methodBody().getStop(), "\n\n\t\tmyWriter.close();\n");
+        }
+    }
+
+
+    // preventing imports duplications
+    @Override
+    public void enterImportDeclaration(JavaParser.ImportDeclarationContext ctx) {
+        if(ctx.qualifiedName().getText().equals("java.io.FileWriter"))
+            fileWriterImport = true;
+
+        if(ctx.qualifiedName().getText().equals("java.io.IOException"))
+            ioExceptionImport = true;
+    }
+
+
+    // handling imports if there are other import statements
+    @Override
+    public void enterTypeDeclaration(JavaParser.TypeDeclarationContext ctx) {
+        super.enterTypeDeclaration(ctx);
+        if(fileWriterImport == false)
+        {
+            rewriter.insertBefore(ctx.getStart(), "\nimport java.io.FileWriter;\n");
+        }
+        if(ioExceptionImport == false)
+        {
+            rewriter.insertBefore(ctx.getStart(), "\nimport java.io.IOException;\n");
+        }
+    }
+
+
+    // injecting Entered blocked code
+    @Override
+    public void enterBlock(JavaParser.BlockContext ctx) {
+
+        if(!isFlowControlStatement)
+        {
+            // inject file write code
+            String insertCode = "// block number: "+blockNumber+"\n\t\tmyWriter.write("+ blockNumber++ +"+\" green\\n\");";
+
+            rewriter.insertAfter(ctx.getStart(), "\n\n\t\t" + insertCode + "\n");
+        }
+
+        isFlowControlStatement = false;
+    }
+
+
+    // handling for & if & else & while with no blocks
+    @Override
+    public void enterStatement(JavaParser.StatementContext ctx) {
+
+        
+        if (ctx.FOR() != null || ctx.WHILE() != null || ctx.IF() != null)
+        {
+
+            String expression = "";
+            if (ctx.FOR() != null)
+            {
+
+                expression  = ctx.forControl().expression().getText().trim();
+            }
+            else if(ctx.WHILE() != null || ctx.IF() != null)
+            {
+                expression = ctx.parExpression().expression().getText().trim();
+            }
+
+            int lastOrIndex = expression.lastIndexOf("||");
+            if (lastOrIndex != -1)
+            {
+                isFlowControlStatement = true;
+                String newExpr = expression.substring(0, lastOrIndex);
+
+                String colorCodeOrange = "\n\t\t// block number: " + blockNumber + "\n\t\tmyWriter.write(" + blockNumber + "+\" orange\\n\");";
+                String colorCodeGreen = "\n\t\t// block number: " + blockNumber + "\n\t\tmyWriter.write(" + blockNumber + "+\" green\\n\");";
+
+                String insertCondition = "\n\t\t\tif(" + newExpr + "){\n" + colorCodeOrange + "\n\t\t\t}\n" + "\t\t\telse {\n" + colorCodeGreen + "\n\t\t\t}";
+
+                rewriter.insertAfter(ctx.statement(0).getStart(), insertCondition);
+                blockNumber++;
+
+            }
+        }
+    }
+
+    public String getNewClassName()
+    {
+        return newClassName;
+    }
+
+
+}
