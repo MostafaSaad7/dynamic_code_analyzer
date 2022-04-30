@@ -206,9 +206,15 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
         }
     }
 
+    /**
+     * This function responsible for returning the new class name which is augmented in
+     *  {@link #enterClassDeclaration} function.
+     *  \return newClassName {@link String}
+     */
 
     public String getNewClassName()
     {
+
         return newClassName;
     }
 
