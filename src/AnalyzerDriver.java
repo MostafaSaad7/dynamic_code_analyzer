@@ -1,13 +1,30 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
+import java.awt.*;
 import java.io.*;
-import java.util.Scanner;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
 
 
 public class AnalyzerDriver {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
+
+        // get augmented code after handling for & if & else & while with no blocks
+        String augmentedJavaCode = augmentedCode();
+
+        // deliverable 2 (generate a text files for visited blocks)
+        String textFileName = textFileGenerator(augmentedJavaCode);
+
+        // wait for the text file with visited block to be saved
+        TimeUnit.SECONDS.sleep(1);
+
+
+    }
+
+    private static String augmentedCode() throws IOException {
 
         // read java filename
         System.out.print("Enter java file path: ");
@@ -18,60 +35,82 @@ public class AnalyzerDriver {
         File file = new File(fileName);
         FileInputStream fis = null;
 
+        // open the input file stream
+        fis = new FileInputStream(file);
 
-        try {
-            // open the input file stream
-            fis = new FileInputStream(file);
+        // starter code
+        ANTLRInputStream input = new ANTLRInputStream(fis);
 
-            // starter code
-            ANTLRInputStream input = new ANTLRInputStream(fis);
+        JavaLexer lexer = new JavaLexer(input);
 
-            JavaLexer lexer = new JavaLexer(input);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
+        JavaParser parser = new JavaParser(tokens);
 
-            JavaParser parser = new JavaParser(tokens);
+        ParseTree tree = parser.compilationUnit();
 
-            ParseTree tree = parser.compilationUnit();
+        ParseTreeWalker walker = new ParseTreeWalker();
 
-            // close the input file
-            fis.close();
+        // create token stream rewriter to inject code snippets
+        TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
 
-            ParseTreeWalker walker = new ParseTreeWalker();
+        //original code
+//        System.out.println(rewriter.getText());
 
-            // create token stream rewriter to inject code snippets
-            TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
+        MyJavaListener extractor = new MyJavaListener(parser,rewriter);
 
-            System.out.println(rewriter.getText());
+        walker.walk(extractor, tree);
 
-            MyJavaListener extractor = new MyJavaListener(parser,rewriter);
+        // modified code
+//        System.out.println(rewriter.getText());
 
-            walker.walk(extractor, tree);
+        fis.close();
 
-            System.out.println(rewriter.getText());
+        return rewriter.getText();
+    }
 
-            // save augmented code
-            String augmentedFilePath = "./augmented_files/"+extractor.getNewClassName()+".java";
-            FileWriter myWriter = new FileWriter(augmentedFilePath, false);
-            myWriter.write(rewriter.getText());
-            myWriter.close();
+    private static String textFileGenerator(String code) throws IOException {
 
+        // starter code
+        ANTLRInputStream input = new ANTLRInputStream(code);
 
-            // running the generated file automatically using a process
-            try
-            {
-                Runtime.getRuntime().exec("java "+augmentedFilePath);
-            }
-            catch(IOException e)
-            {
-                System.err.println("Error on exec() method");
-                e.printStackTrace();
-            }
+        JavaLexer lexer = new JavaLexer(input);
 
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        JavaParser parser = new JavaParser(tokens);
+
+        // create token stream rewriter to inject code snippets
+        TokenStreamRewriter textFileRewriter = new TokenStreamRewriter(tokens);
+
+        ParseTree tree = parser.compilationUnit();
+
+        ParseTreeWalker walker = new ParseTreeWalker();
+
+        MyTextFileGenerator extractor = new MyTextFileGenerator(parser,textFileRewriter);
+
+        walker.walk(extractor, tree);
+
+        // code after injecting visited blocks
+//            System.out.println(textFileRewriter.getText());
+
+        // save augmented code
+        String augmentedFilePath = "./augmented_files/"+extractor.getNewClassName()+".java";
+        FileWriter myWriter = new FileWriter(augmentedFilePath, false);
+        myWriter.write(textFileRewriter.getText());
+        myWriter.close();
+
+        // running the generated file automatically using a process
+        try
+        {
+            Runtime.getRuntime().exec("java "+augmentedFilePath);
+        }
+        catch(IOException e)
+        {
+            System.err.println("Error on exec() method");
             e.printStackTrace();
         }
 
+        return extractor.getNewClassName();
     }
 }
