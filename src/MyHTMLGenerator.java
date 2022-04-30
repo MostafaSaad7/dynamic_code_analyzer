@@ -56,4 +56,66 @@ public class MyHTMLGenerator extends JavaParserBaseListener {
                 "</html>";
         rewriter.insertAfter(ctx.getStop(), "\n" + HTMLFooter + "\n");
     }
+
+
+    /**
+     * <b>This function is responsible for injecting red color</b><br>
+     * set red color for not visited blocks after rapping them with pre html tag.<br>
+     * the red color is set for the entry block area.
+     * @param ctx that contain the children of this rule.
+     * @return {@link Void}
+     */
+
+    // injecting Entered blocked code
+    @Override
+    public void enterBlock(JavaParser.BlockContext ctx) {
+
+        String pre;
+        if (!enteredBlocks.containsKey(blockNumber))
+        {
+            pre = "<span style=\"background-color: rgb(245, 173, 153); margin: 0%;\">";
+
+//        System.out.println("hello parent "+ctx.getParent().getParent().getText());
+            //TODO: inject pre string before parent
+
+            rewriter.insertBefore(ctx.getStart(), pre + "\t");
+            rewriter.insertAfter(ctx.getStop(), "</span>");
+        }
+        blockNumber++;
+
+    }
+
+    /**
+     * <b>This function is responsible for injecting orange color</b><br>
+     * for any existing branch (while, for, if), set orange color for expression area of the branch converge by rapping it with span html tag.
+     * @param ctx that contain the children of this rule.
+     * @return {@link Void}
+     */
+    @Override
+    public void enterStatement(JavaParser.StatementContext ctx) {
+
+        if (ctx.FOR() != null || ctx.WHILE() != null || ctx.IF() != null)
+        {
+            if (enteredBlocks.containsKey(blockNumber) && enteredBlocks.get(blockNumber).equals("orange"))
+            {
+                String pre = "<span style=\"background-color: rgb(241, 206, 116); margin: 0%;\">";
+                Token startToken = null;
+                Token stopToken = null;
+
+                if (ctx.FOR() != null)
+                {
+                    startToken = ctx.forControl().expression().getStart();
+                    stopToken =  ctx.forControl().expression().getStop();
+                }
+                else if (ctx.WHILE() != null || ctx.IF() != null)
+                {
+                    startToken = ctx.parExpression().expression().getStart();
+                    stopToken =  ctx.parExpression().expression().getStop();
+                }
+
+                rewriter.insertBefore(startToken, pre);
+                rewriter.insertAfter(stopToken, "</span>");
+            }
+        }
+    }
 }
