@@ -30,7 +30,19 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
     }
 
 
-    // handling required imports if there are no other import statements
+    /**
+     * This function is responsible for handling required imports if there are no other import statements.
+     *
+     * The production of the grammar rule is : \n\n
+     * compilationUnit \n
+     *     : packageDeclaration? importDeclaration* typeDeclaration* \n
+     *     | moduleDeclaration EOF \n
+     *     ; \n
+     *
+     * \param ctx Ctx that contain the children of this rule
+     *
+     * \return {@link Void}
+     */
     @Override
     public void enterCompilationUnit(JavaParser.CompilationUnitContext ctx) {
 
@@ -55,7 +67,24 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
     }
 
 
-    // handling augmented class name
+    /**
+     * This function is responsible for handling augmented class name. \n
+     * it creates new name for the class to be saved with
+     *
+     * The production of the grammar rule is : \n\n
+     *
+     * classDeclaration \n
+     *     : CLASS identifier typeParameters?\n
+     *       (EXTENDS typeType)?\n
+     *       (IMPLEMENTS typeList)?\n
+     *       (PERMITS typeList)? // Java17\n
+     *       classBody\n
+     *     ;\n
+     *
+     * \param ctx Ctx that contain the children of this rule
+     *
+     * \return {@link Void}
+     */
     @Override
     public void enterClassDeclaration(JavaParser.ClassDeclarationContext ctx) {
         newClassName = ctx.identifier().getText()+"Augmented";
@@ -66,7 +95,21 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
     }
 
 
-    // handling exceptions & initializing the FileWriter in the main function
+    /**
+     * This function is responsible for handling exceptions to throw IOException \n
+     * also make sure to initialize the FileWriter in the main function.
+     *
+     * The production of the grammar rule is : \n\n
+     * methodDeclaration
+     *     : typeTypeOrVoid identifier formalParameters ('[' ']')*
+     *       (THROWS qualifiedNameList)?
+     *       methodBody
+     *     ;\n
+     *
+     * \param ctx Ctx that contain the children of this rule
+     *
+     * \return {@link Void}
+     */
     @Override
     public void enterMethodDeclaration(JavaParser.MethodDeclarationContext ctx) {
         String methodName = ctx.identifier().getText();
@@ -127,9 +170,6 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
         }
     }
 
-
-    // injecting Entered blocked code
-
     /**
      * This function is responsible for injecting the code snippet that write the entered block number and its color in a text file. \n
      *
@@ -154,6 +194,9 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
 
         isFlowControlStatement = false;
     }
+
+
+    // injecting Entered blocked code
 
 
     /**
