@@ -136,7 +136,7 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
     /**
      * This function is responsible for injecting code snippet for closing the text file at main function
      *
-     * \param  ctx  that contain the children of this rule
+     * \param  ctx  that contains the children of this rule
      *
      * \return {@link Void}
      */
@@ -154,7 +154,7 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
     /**
      * This function is responsible for preventing imports duplications by checking if FileWriter or IOException classes already imported
      *
-     * \param  ctx  that contain the children of this rule
+     * \param  ctx  that contains the children of this rule
      *
      * \return {@link Void}
      */
@@ -168,7 +168,13 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
     }
 
 
-    // handling imports if there are other import statements
+    /**
+     * This function is responsible for handling imports if there are other import statements by inserting imports before it
+     *
+     * \param  ctx  that contains the children of this rule
+     *
+     * \return {@link Void}
+     */
     @Override
     public void enterTypeDeclaration(JavaParser.TypeDeclarationContext ctx) {
         super.enterTypeDeclaration(ctx);
