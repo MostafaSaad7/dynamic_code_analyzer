@@ -1,6 +1,4 @@
 
-package augmented_files;
-
 import java.io.IOException;
 
 import java.io.FileWriter;
@@ -15,17 +13,17 @@ public class FactorialAugmented
 		myWriter = new FileWriter("visited_blocks/FactorialAugmentedVisitedBlocks.txt");
 
 
-		// block number: 1
-		myWriter.write("Entered Block Number: 1\n");
+		// block number: 0
+		myWriter.write(0+" green\n");
 	final int NUM_FACTS = 100;
 		for(int i = 0; i < NUM_FACTS; i++)
 			{
 
+		// block number: 1
+		myWriter.write(1+" green\n");
 
-		// block number: 2
-		myWriter.write("Entered Block Number: 2\n");
-System.out.println( i + "! is " + factorial(i));
-		}
+	    System.out.println( i + "! is " + factorial(i));
+	}
 
 	
 
@@ -35,17 +33,17 @@ System.out.println( i + "! is " + factorial(i));
 	public static int factorial(int n)
 	throws IOException{
 
-		// block number: 3
-		myWriter.write("Entered Block Number: 3\n");
+		// block number: 2
+		myWriter.write(2+" green\n");
 	int result = 1;
 		for(int i = 2; i <= n; i++)
 			{
 
+		// block number: 3
+		myWriter.write(3+" green\n");
 
-		// block number: 4
-		myWriter.write("Entered Block Number: 4\n");
-result *= i;
-		}
+	    result *= i;
+	}
 
 		return result;
 	}
