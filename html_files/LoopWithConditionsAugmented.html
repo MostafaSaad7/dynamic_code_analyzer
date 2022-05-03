@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html>
+    <title>
+        Background
+    </title>
+    <body style="margin: 0%;">
+        <pre style="background-color: rgb(181, 248, 190); margin: 0%;">
+class LoopWithConditions {
+	
+    public static void main(String[] args) {
+
+        int x = 10;
+        int y = 5;
+        int z = 2;
+
+        while(x > 0) {
+            // this should be green
+
+            if(x > 5 || y == 5)
+            {
+                // this will be orange in the first 5 iterations then it should become green
+                System.out.println("Hello, World!");
+            }
+
+            else if (y>5) <pre style="background-color: rgb(245, 173, 153); margin: 0%;">	{
+                // this should be red (will never be reached)
+                System.out.println("Hello, World!");
+            }</pre>
+
+            if(<span style="background-color: rgb(241, 206, 116); margin: 0%;">x > 5 || y == 5 || z==2</span>)
+            {
+                // this will be orange in all 10 iterations because the third condition
+                // will never be evaluated
+
+                System.out.println("Hello, World!");
+            }
+
+            x--;
+
+        }
+
+    }
+	
+}
+</pre>
+    </body>
+</html>
