@@ -133,7 +133,13 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
         }
     }
 
-    // injecting code snippet for closing the text file
+    /**
+     * This function is responsible for injecting code snippet for closing the text file
+     *
+     * \param  ctx  that contain the children of this rule
+     *
+     * \return {@link Void}
+     */
     @Override
     public void exitMethodDeclaration(JavaParser.MethodDeclarationContext ctx) {
         String methodName = ctx.identifier().getText();
