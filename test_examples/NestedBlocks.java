@@ -1,8 +1,3 @@
-/* NestedBlocks.java
- *
- * illustrates how to call nested blocks
- */
-
 public class NestedBlocks
 {
     public static void main(String[] args) {
@@ -24,7 +19,7 @@ public class NestedBlocks
         }
 
         if (x==11)
-            if(true)
+            if(true || false)
                 if(y==6)
                     System.out.println("finish");
     }
