@@ -134,7 +134,7 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
     }
 
     /**
-     * This function is responsible for injecting code snippet for closing the text file
+     * This function is responsible for injecting code snippet for closing the text file at main function
      *
      * \param  ctx  that contain the children of this rule
      *
@@ -151,7 +151,13 @@ public class MyTextFileGenerator extends JavaParserBaseListener{
     }
 
 
-    // preventing imports duplications
+    /**
+     * This function is responsible for preventing imports duplications by checking if FileWriter or IOException classes already imported
+     *
+     * \param  ctx  that contain the children of this rule
+     *
+     * \return {@link Void}
+     */
     @Override
     public void enterImportDeclaration(JavaParser.ImportDeclarationContext ctx) {
         if(ctx.qualifiedName().getText().equals("java.io.FileWriter"))
